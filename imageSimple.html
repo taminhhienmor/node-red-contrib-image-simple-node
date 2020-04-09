@@ -1,0 +1,188 @@
+<script type="text/x-red" data-template-name="imageSimple">
+	<div class="form-row">
+		<label for="node-input-original">&nbsp;</label>
+		<input type="checkbox" id="node-input-original" onclick="checkOriginal()" style="width:2%; transform: scale(1.9); vertical-align: text-bottom;">
+		<label for="node-input-original" style="width:40%; margin-left: 1%;"> Get Original Image</label>
+	</div>
+	<div class="form-row">
+		<label for="node-input-imageData"><i class="fa fa-file-image-o"></i> Link Image</label>
+		<input type="text" id="node-input-imageData" style="width:70%">
+	</div>
+	<div class="form-row">
+		<label for="node-input-resize"><i class="fa fa-arrows-alt"></i> Resize</label>
+		<label for="node-input-width" style="width:10%"> Width</label>
+		<input type="number" id="node-input-width" style="width:14%">
+		<label for="node-input-height" class="grpHeight" style="width:10%; margin-left: 4%;"> Height</label>
+		<input type="number" id="node-input-height" class="grpHeight" style="width:14%">
+		<input type="checkbox" id="node-input-autoresize" onchange="checkAuto()" style="width:2%; margin-left: 4%; transform: scale(1.9); vertical-align: text-bottom;">
+		<label for="node-input-autoresize" style="width:4%; margin-left: 1%;"> Auto</label>
+	</div>
+	<div class="form-row">
+		<label for="node-input-rotate"><i class="fa fa-undo"></i> Rotate</label>
+		<input type="number" id="node-input-rotate">
+	</div>
+	<div class="form-row">
+		<label for="node-input-flip"><i class="fa fa-recycle"></i> Flip</label>
+		<label for="node-input-flipX" style="width:10%"> Horizontal</label>
+		<input type="checkbox" id="node-input-flipX" style="width:14%; transform: scale(1.5); vertical-align: top;">
+		<label for="node-input-flipY" style="width:10%; margin-left: 4%;"> Vertical</label>
+		<input type="checkbox" id="node-input-flipY" style="width:14%; transform: scale(1.5); vertical-align: top;">		
+	</div>
+	<div class="form-row">
+		<label for="node-input-crop"><i class="fa fa-crop"></i> Crop</label>
+		<label for="node-input-cropX" style="width:10%"> X</label>
+		<input type="number" id="node-input-cropX" style="width:14%">
+		<label for="node-input-cropY" style="width:10%; margin-left: 4%;"> Y</label>
+		<input type="number" id="node-input-cropY" style="width:14%">		
+	</div>
+	<div class="form-row">
+		<label for="node-input-crop">&nbsp;</label>
+		<label for="node-input-cropWidth" style="width:10%"> Width</label>
+		<input type="number" id="node-input-cropWidth" style="width:14%">
+		<label for="node-input-cropHeight" style="width:10%; margin-left: 4%;"> Height</label>
+		<input type="number" id="node-input-cropHeight" style="width:14%">		
+	</div>
+	<div class="form-row">
+		<label for="node-input-reset">&nbsp;</label>
+		<button id="node-input-reset" onclick="resetDefault()" style="background-color: #efefef; border-radius: 4px; border: 1px solid #ccc;">Reset Default</button>
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="imageSimple">
+    <p>Edit image simple: resize, rotate, crop and download edited image as "image_edit.png"</p>
+    <p>Input Parameters:
+        <ul>
+            <li><b>payload</b> - The image file input or the <code>msg.[name]</code> property</li>
+            <li><b>localFilename</b> - The downloaded local file name <code>msg.localFilename</code> property</li>
+        </ul>
+    </p>
+    <p>Return values:
+        <ul>
+            <li>Will either be success or provide an error state</li>
+        </ul>
+    </p>
+</script>
+
+<script type="text/javascript">
+	const INIT_WIDTH = 200
+	const INIT_HEIGHT = 200
+	const INIT_ROTATE = 0
+	const INIT_CROP_X = 0
+	const INIT_CROP_Y = 0
+	const INIT_CROP_WIDTH = 200
+	const INIT_CROP_HEIGHT = 200
+	
+	RED.nodes.registerType('imageSimple', {
+		category: 'Image simple',
+		paletteLabel: "Image",
+		label: "Image",
+		icon: "image_icon.png",
+		align: 'left',
+		color: '#C0DEED',
+		defaults: {
+			imageData: {value: "", required: true, validate: RED.validators.typedInput("imageType") },
+            imageType: {value: "str"},
+            autoresize: {value: false},
+            original: {value: false},
+            flipX: {value: false},
+            flipY: {value: false},
+            width: {value: INIT_WIDTH, required: true},
+            height: {value: INIT_HEIGHT, required: true},
+            rotate: {value: INIT_ROTATE, required: true},
+            cropX: {value: INIT_CROP_X, required: true},
+            cropY: {value: INIT_CROP_Y, required: true},
+            cropWidth: {value: INIT_CROP_WIDTH, required: true},
+            cropHeight: {value: INIT_CROP_HEIGHT, required: true}
+		},
+		inputs: 1,
+		outputs: 1,
+		oneditprepare: function () {
+			$("#node-input-imageData").typedInput({ default: this.imageType || 'str', types: ['str', 'msg', 'flow', 'global'] });
+			checkOriginal();
+		}, 
+		oneditsave: function () {
+			this.imageType = $("#node-input-imageData").typedInput('type');
+		}
+	});
+
+	function resetDefault() {
+		$('#node-input-width').val(INIT_WIDTH)
+		$('#node-input-height').val(INIT_HEIGHT)
+		$('#node-input-rotate').val(INIT_ROTATE)
+
+		$('#node-input-cropX').val(INIT_CROP_X)
+		$('#node-input-cropY').val(INIT_CROP_Y)
+		$('#node-input-cropWidth').val(INIT_CROP_WIDTH)
+		$('#node-input-cropHeight').val(INIT_CROP_HEIGHT)
+
+		$('#node-input-autoresize').removeAttr('checked')
+		$('#node-input-flipX').removeAttr('checked')
+		$('#node-input-flipY').removeAttr('checked')
+	}
+
+	function checkOriginal() {
+		var original = document.getElementById("node-input-original");
+		if (original.checked == true) {
+			$('#node-input-width').attr('disabled','disabled')
+			$('#node-input-height').attr('disabled','disabled')
+			$('#node-input-rotate').attr('disabled','disabled')
+			$('#node-input-cropX').attr('disabled','disabled')
+			$('#node-input-cropY').attr('disabled','disabled')
+			$('#node-input-cropWidth').attr('disabled','disabled')
+			$('#node-input-cropHeight').attr('disabled','disabled')
+			$('#node-input-autoresize').attr('disabled','disabled')
+			$('#node-input-flipX').attr('disabled','disabled')
+			$('#node-input-flipY').attr('disabled','disabled')
+			$('#node-input-reset').attr('disabled','disabled')
+		} else {
+			$('#node-input-width').removeAttr('disabled')
+			$('#node-input-height').removeAttr('disabled')
+			$('#node-input-rotate').removeAttr('disabled')
+			$('#node-input-cropX').removeAttr('disabled')
+			$('#node-input-cropY').removeAttr('disabled')
+			$('#node-input-cropWidth').removeAttr('disabled')
+			$('#node-input-cropHeight').removeAttr('disabled')
+			$('#node-input-autoresize').removeAttr('disabled')
+			$('#node-input-flipX').removeAttr('disabled')
+			$('#node-input-flipY').removeAttr('disabled')
+			$('#node-input-reset').removeAttr('disabled')
+		}
+	}
+
+	function checkAuto() {
+		var autoresize = document.getElementById("node-input-autoresize");
+		if (autoresize.checked == true) {
+			document.getElementsByClassName("grpHeight")[0].style.display = "none";
+			document.getElementsByClassName("grpHeight")[1].style.display = "none";
+		} else {
+			document.getElementsByClassName("grpHeight")[0].style.display = "inline-block";
+			document.getElementsByClassName("grpHeight")[1].style.display = "inline-block";
+		}
+	}
+
+	const latestImageId = {}
+	RED.comms.subscribe('image_png', function (event, data) {
+		if (data.hasOwnProperty("imageData")) {
+			latestImageId[data.id] = data.imageData
+			let image = document.getElementById('image-output-newImage-' + data.id)
+			if (!image) {
+				const $container = document.getElementById(data.id)
+				if (!$container) { return }
+
+				const newImage = document.createElementNS("http://www.w3.org/2000/svg", 'image')
+				newImage.setAttribute('id', 'image-output-newImage-' + data.id)
+				newImage.setAttribute('x', '0')
+				newImage.setAttribute('y', '36')
+				newImage.setAttribute('position', 'absolute')
+				$container.insertBefore(newImage, $container.lastChild.nextSibling)
+				image = newImage
+			}
+			image.setAttribute('href', data.imageData);
+		}
+		else {
+			document.getElementById('image-output-newImage-' + data.id).remove()
+			delete latestImageId[data.id]
+		}
+	})
+
+</script>
