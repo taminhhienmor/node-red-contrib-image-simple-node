@@ -8,7 +8,7 @@ module.exports = function (RED) {
 
 		// data image
 		var imageData = config.imageData || "";
-		var imageType = config.imageType || "str";
+		var imageType = config.imageType || "msg";
 		var globalContext = this.context().global;
         var flowContext = this.context().flow;
 		
