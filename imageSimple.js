@@ -63,7 +63,7 @@ module.exports = function (RED) {
 				return;
 			}
 
-			msg.localFilename = 'image_edit.png'
+			msg.localFilename = msg.localFilename || 'image_edit.png'
 			try {
 				if (original) {
 					Jimp.read(image, (err, img) => {
