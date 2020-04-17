@@ -24,19 +24,21 @@
 	<div class="form-row">
 		<label for="node-input-flip"><i class="fa fa-recycle"></i> Flip</label>
 		<label for="node-input-flipX" style="width:10%"> Horizontal</label>
-		<input type="checkbox" id="node-input-flipX" style="width:14%; transform: scale(1.5); vertical-align: top;">
+		<input type="checkbox" id="node-input-flipX" style="width:14%; transform: scale(1.6); vertical-align: top;">
 		<label for="node-input-flipY" style="width:10%; margin-left: 4%;"> Vertical</label>
-		<input type="checkbox" id="node-input-flipY" style="width:14%; transform: scale(1.5); vertical-align: top;">		
+		<input type="checkbox" id="node-input-flipY" style="width:14%; transform: scale(1.6); vertical-align: top;">		
 	</div>
 	<div class="form-row">
-		<label for="node-input-crop"><i class="fa fa-crop"></i> Crop</label>
+		<label for="node-input-crop1"><i class="fa fa-crop"></i> Crop</label>
 		<label for="node-input-cropX" style="width:10%"> X</label>
 		<input type="number" id="node-input-cropX" style="width:14%">
 		<label for="node-input-cropY" style="width:10%; margin-left: 4%;"> Y</label>
-		<input type="number" id="node-input-cropY" style="width:14%">		
+		<input type="number" id="node-input-cropY" style="width:14%">
+		<input type="checkbox" id="node-input-crop" onchange="disableCrop()" style="width:2%; margin-left: 4%; transform: scale(1.9); vertical-align: text-bottom;">
+		<label for="node-input-crop" style="width:4%; margin-left: 1%;"> Disable</label>		
 	</div>
 	<div class="form-row">
-		<label for="node-input-crop">&nbsp;</label>
+		<label for="node-input-crop2">&nbsp;</label>
 		<label for="node-input-cropWidth" style="width:10%"> Width</label>
 		<input type="number" id="node-input-cropWidth" style="width:14%">
 		<label for="node-input-cropHeight" style="width:10%; margin-left: 4%;"> Height</label>
@@ -88,7 +90,8 @@
             flipY: {value: false},
             width: {value: INIT_WIDTH, required: true},
             height: {value: INIT_HEIGHT, required: true},
-            rotate: {value: INIT_ROTATE, required: true},
+			rotate: {value: INIT_ROTATE, required: true},
+			crop: {value: false},
             cropX: {value: INIT_CROP_X, required: true},
             cropY: {value: INIT_CROP_Y, required: true},
             cropWidth: {value: INIT_CROP_WIDTH, required: true},
@@ -126,6 +129,7 @@
 			$('#node-input-width').attr('disabled','disabled')
 			$('#node-input-height').attr('disabled','disabled')
 			$('#node-input-rotate').attr('disabled','disabled')
+			$('#node-input-crop').attr('disabled','disabled')
 			$('#node-input-cropX').attr('disabled','disabled')
 			$('#node-input-cropY').attr('disabled','disabled')
 			$('#node-input-cropWidth').attr('disabled','disabled')
@@ -138,6 +142,7 @@
 			$('#node-input-width').removeAttr('disabled')
 			$('#node-input-height').removeAttr('disabled')
 			$('#node-input-rotate').removeAttr('disabled')
+			$('#node-input-crop').removeAttr('disabled')
 			$('#node-input-cropX').removeAttr('disabled')
 			$('#node-input-cropY').removeAttr('disabled')
 			$('#node-input-cropWidth').removeAttr('disabled')
@@ -157,6 +162,21 @@
 		} else {
 			document.getElementsByClassName("grpHeight")[0].style.display = "inline-block";
 			document.getElementsByClassName("grpHeight")[1].style.display = "inline-block";
+		}
+	}
+
+	function disableCrop() {
+		var crop = document.getElementById("node-input-crop");
+		if (crop.checked == true) {
+			$('#node-input-cropX').attr('disabled','disabled')
+			$('#node-input-cropY').attr('disabled','disabled')
+			$('#node-input-cropWidth').attr('disabled','disabled')
+			$('#node-input-cropHeight').attr('disabled','disabled')
+		} else {
+			$('#node-input-cropX').removeAttr('disabled')
+			$('#node-input-cropY').removeAttr('disabled')
+			$('#node-input-cropWidth').removeAttr('disabled')
+			$('#node-input-cropHeight').removeAttr('disabled')
 		}
 	}
 

@@ -16,7 +16,6 @@ module.exports = function (RED) {
 		var width = parseInt(config.width)
 		var height = parseInt(config.height)
 		var autoresize = config.autoresize
-		if (autoresize) height = width;
 
 		// flip
 		var flipX = config.flipX
@@ -26,6 +25,7 @@ module.exports = function (RED) {
 		var rotate = parseInt(config.rotate) || 0
 
 		// crop
+		var cropFlag = config.crop || false
 		var cropX = parseInt(config.cropX) || 0 
 		var cropY = parseInt(config.cropY) || 0
 		var cropWidth = parseInt(config.cropWidth) || 0 
@@ -91,19 +91,24 @@ module.exports = function (RED) {
 							node.status({fill:"red",shape:"ring",text:"image invalid"});        
 							return;
 						};
+						if (autoresize) {
+							height = img.bitmap.height / (img.bitmap.width / width);
+						}
 						img
 						.resize(width, height)
 						.rotate(rotate)
-						if (cropX + cropWidth > width) {
-							node.error(RED._("cropX and cropWidth are larger width!"),msg)
-							node.status({fill:"red",shape:"ring",text:"crop invalid"});        
-							return;
-						} else if (cropY + cropHeight > height ) {
-							node.error(RED._("cropY and cropHeight are larger height!"),msg)
-							node.status({fill:"red",shape:"ring",text:"crop invalid"});        
-							return;
-						} else {
-							img.crop(cropX, cropY, cropWidth, cropHeight)
+						if(!cropFlag) {
+							if (cropX + cropWidth > width) {
+								node.error(RED._("cropX and cropWidth are larger width(" + width + ")!"),msg)
+								node.status({fill:"red",shape:"ring",text:"crop invalid"});        
+								return;
+							} else if (cropY + cropHeight > height ) {
+								node.error(RED._("cropY and cropHeight are larger height(" + height + ")!"),msg)
+								node.status({fill:"red",shape:"ring",text:"crop invalid"});        
+								return;
+							} else {
+								img.crop(cropX, cropY, cropWidth, cropHeight)
+							}
 						}
 						img.flip(flipX, flipY)
 						.write(msg.localFilename)
