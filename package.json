@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-image-simple-node",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "The simplest of simple nodes with image",
     "keywords": [
         "node-red",
@@ -29,6 +29,7 @@
         }
     ],
     "dependencies": {
-        "jimp": "^0.10.1"
+        "jimp": "^0.10.1",
+        "fs": "^0.0.1-security"
     }
 }

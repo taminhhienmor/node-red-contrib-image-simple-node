@@ -6,7 +6,9 @@
 	</div>
 	<div class="form-row">
 		<label for="node-input-imageData"><i class="fa fa-file-image-o"></i> Link Image</label>
-		<input type="text" id="node-input-imageData" style="width:70%">
+		<input type="text" id="node-input-imageData" style="width:49%">
+		<input type="checkbox" id="node-input-localfile" style="width:2%; transform: scale(1.9); margin-left: 1%; vertical-align: text-bottom;">
+		<label for="node-input-localfile" style="width:18%; margin-left: 1%;"> Local File</label>
 	</div>
 	<div class="form-row">
 		<label for="node-input-resize"><i class="fa fa-arrows-alt"></i> Resize</label>
@@ -85,7 +87,8 @@
 			imageData: {value: "payload", required: true, validate: RED.validators.typedInput("imageType") },
             imageType: {value: "msg"},
             autoresize: {value: false},
-            original: {value: false},
+			original: {value: false},
+			localfile: {value: false},
             flipX: {value: false},
             flipY: {value: false},
             width: {value: INIT_WIDTH, required: true},
